@@ -2,7 +2,8 @@ package com.example.liverinsight
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.compose.composable
+import androidx.navigation.NavHostController
 import androidx.navigation.NavGraph
 import androidx.navigation.compose.NavHost
 import com.example.liverinsight.features.Screen
@@ -15,7 +16,7 @@ import com.example.liverinsight.features.profile.presentation.ProfileScreen
 
 
 @Composable
-fun NavGraph(navController: NavController, userViewModel: AuthViewModel = viewModel()) {
+fun NavGraph(navController: NavHostController, userViewModel: AuthViewModel = viewModel()) {
     NavHost(navController = navController, startDestination = Screen.Splash.route) {
         composable(Screen.Splash.route) {
             SplashScreen(navController = navController)
