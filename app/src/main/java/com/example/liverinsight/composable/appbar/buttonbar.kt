@@ -1,6 +1,7 @@
 package com.example.liverinsight.composable.appbar
 
 import android.graphics.drawable.Icon
+import com.example.liverinsight.Screen
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -29,12 +30,11 @@ fun ButtonBar(
     ) {
         val item = listOf(
             ButtonBarItem("Home", Icons.Default.Home, Screen.Home.route),
-            ButtonBarItem("Profile", Icons.Default.Person, Screen.Profile.route)
         )
 
         item.forEach { item ->
             NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.name) },
+                icon = { androidx.compose.material3.Icon(item.icon, contentDescription = item.name) },
                 selected = currentScreen == item.route,
                 onClick = {
                     // Navigasi ke item yang dipilih
