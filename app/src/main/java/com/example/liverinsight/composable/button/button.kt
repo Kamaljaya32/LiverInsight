@@ -1,6 +1,6 @@
 package com.example.liverinsight.composable.button
 
-import android.widget.Button
+import androidx.compose.material3.Button
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,7 +23,7 @@ fun Button(
             .fillMaxWidth()
             .height(48.dp),
         shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(containterColor = Color(0xffcc2b31))
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xffcc2b31))
     ) {
         Text(text, color = Color.White)
     }

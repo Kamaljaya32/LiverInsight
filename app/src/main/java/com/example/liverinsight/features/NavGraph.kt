@@ -22,6 +22,7 @@ fun NavGraph(navController: NavHostController) {
         }
 
     }
+
 }
 
 sealed class Screen(val route: String) {
