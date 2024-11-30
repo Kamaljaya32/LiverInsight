@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "369358826173",
+    "project_id": "liver-insight",
+    "storage_bucket": "liver-insight.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369358826173:android:0f026b4955949f103be5d4",
+        "android_client_info": {
+          "package_name": "com.example.liverinsight"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDp6HZupyEHINVVRkXjtDijx9yRkvGrkk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

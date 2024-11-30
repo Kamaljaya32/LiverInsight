@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
@@ -23,20 +24,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.liverinsight.R
-import com.example.liverinsight.features.Screen
+import com.example.liverinsight.Screen
 import kotlinx.coroutines.delay
 
 
 @Composable
 fun SplashScreen(navController: NavController){
-//    LaunchedEffect(true) {
-//        delay(2000)
-//        navController.navigate(Screen.SignIn.route){
-//            popUpTo(Screen.Splash.route){
-//                inclusive = true
-//            }
-//        }
-//    }
+    LaunchedEffect(true) {
+        delay(2000)
+        navController.navigate(Screen.SignIn.route){
+            popUpTo(Screen.Splash.route){
+                inclusive = true
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -52,14 +53,16 @@ fun SplashScreen(navController: NavController){
             Image(
                 painter = image,
                 contentDescription = "Liver Insight Logo",
-                modifier = Modifier.size(300.dp)
+                modifier = Modifier
+                    .size(300.dp)
+                    .offset(y = -50.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp)) // Jarak antara gambar dan teks
+            Spacer(modifier = Modifier.height(1.dp)) // Jarak antara gambar dan teks
             Text(
                 text = "Future of Wellness",
                 color = Color(0xffcc2b31),
                 fontSize = 16.sp,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 1.dp)
             )
         }
     }

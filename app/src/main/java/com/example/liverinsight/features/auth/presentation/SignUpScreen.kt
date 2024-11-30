@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -30,6 +31,9 @@ import com.example.liverinsight.features.auth.data.AuthViewModel
 import com.example.liverinsight.composable.button.Button
 import com.example.liverinsight.composable.button.OutlinedButton
 import com.example.liverinsight.composable.textfield.TextField
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 
 
 @Composable
@@ -44,18 +48,10 @@ fun SignUpScreen(navController: NavController, authViewModel: AuthViewModel = vi
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val gradientColors = listOf(
-        Color(0xFFFCE4EC),  // Light pink
-        Color(0xFFF3E5F5),  // Light purple
-        Color(0xFFE8EAF6)   // Light indigo
-    )
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(colors = gradientColors)
-            )
+            .background(color = Color.White)
     ) {
         Column(
             modifier = Modifier
@@ -70,22 +66,18 @@ fun SignUpScreen(navController: NavController, authViewModel: AuthViewModel = vi
                 painter = painterResource(id = R.drawable.project1),
                 contentDescription = "User registering",
                 modifier = Modifier
-                    .size(200.dp)
+                    .size(250.dp)
                     .clip(RoundedCornerShape(16.dp))
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                "Welcome!",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.W400
-            )
-
-            Text(
-                "Create your account",
+                "Welcome to Liver Insight",
+                color = Color(0xFFCC2B31),
                 style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontSize = 30.sp
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -131,28 +123,54 @@ fun SignUpScreen(navController: NavController, authViewModel: AuthViewModel = vi
             Button(
                 text = "Sign Up",
                 onClick = {
-                    when {
-                        authViewModel.email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() -> {
-                            snackbarMessage = "Please fill in all fields"
-                            showSnackbar = true
-                        }
-                        password != confirmPassword -> {
-                            snackbarMessage = "Passwords do not match"
-                            showSnackbar = true
-                        }
-                        else -> {
-                            // Handle Sign Up Logic
-                            navController.navigate("home") {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
+                    if (authViewModel.email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                        snackbarMessage = "Please fill in all fields"
+                        showSnackbar = true
+                    } else if (password != confirmPassword) {
+                        snackbarMessage = "Passwords do not match"
+                        showSnackbar = true
+                    } else if (password.length < 8) {
+                        snackbarMessage = "Password must be at least 8 characters"
+                        showSnackbar = true
+                    }
+                    else {
+                        authViewModel.signUp(authViewModel.email, password)
                     }
                 }
             )
+
+            // Observasi hasil autentikasi
+            LaunchedEffect(authViewModel.authResult) {
+                authViewModel.authResult?.let { result ->
+                    if (result.isSuccess) {
+                        // Navigasi ke halaman Home jika berhasil
+                        navController.navigate("home") {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    } else {
+                        // Tangkap dan tangani exception
+                        when (val exception = result.exceptionOrNull()) {
+                            is FirebaseAuthWeakPasswordException -> {
+                                snackbarMessage = "Weak password. Please use at least 6 characters."
+                            }
+                            is FirebaseAuthUserCollisionException -> {
+                                snackbarMessage = "Email already in use. Please use a different email."
+                            }
+                            is FirebaseAuthInvalidCredentialsException -> {
+                                snackbarMessage = "Invalid email format. Please check your email."
+                            }
+                            else -> {
+                                snackbarMessage = exception?.message ?: "Sign Up Failed. Please try again."
+                            }
+                        }
+                        showSnackbar = true
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -160,7 +178,7 @@ fun SignUpScreen(navController: NavController, authViewModel: AuthViewModel = vi
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier
                         .weight(1f)
                         .align(Alignment.CenterVertically),
@@ -171,7 +189,7 @@ fun SignUpScreen(navController: NavController, authViewModel: AuthViewModel = vi
                     modifier = Modifier.padding(horizontal = 16.dp),
                     color = Color.Gray
                 )
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier
                         .weight(1f)
                         .align(Alignment.CenterVertically),
@@ -223,3 +241,4 @@ fun PreviewSignUpScreen() {
     val mockNavController = rememberNavController()
     SignUpScreen(navController = mockNavController)
 }
+
