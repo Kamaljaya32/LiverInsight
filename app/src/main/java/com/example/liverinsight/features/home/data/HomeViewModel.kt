@@ -38,6 +38,33 @@ class HomeViewModel : ViewModel() {
     private var interpreter: Interpreter? = null
     private var isModelReady = false
 
+    // Nilai rata-rata dan deviasi standar untuk normalisasi
+    private val means = floatArrayOf(
+        44.74614065180103f,
+        0.7564322469982847f,
+        3.298799313893653f,
+        1.486106346483705f,
+        290.57632933104634f,
+        80.71355060034305f,
+        109.91080617495712f,
+        6.483190394511149f,
+        3.141852487135506f,
+        0.9470639032815198f
+    )
+
+    private val stdDevs = floatArrayOf(
+        16.175942411270466f,
+        0.429234787382629f,
+        6.204193950230359f,
+        2.806087923849646f,
+        242.72954813780882f,
+        182.46366758318712f,
+        288.67063666027326f,
+        1.0845201655473806f,
+        0.7948362500202801f,
+        0.3182186930338783f
+    )
+
     init {
         initializeModel()
     }
@@ -51,7 +78,7 @@ class HomeViewModel : ViewModel() {
                 val conditions = CustomModelDownloadConditions.Builder().build()
 
                 FirebaseModelDownloader.getInstance()
-                    .getModel("liver-detection", DownloadType.LOCAL_MODEL, conditions)
+                    .getModel("liver-detection2", DownloadType.LOCAL_MODEL, conditions)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Log.d("HomeViewModel", "Model download successful.")
@@ -102,34 +129,18 @@ class HomeViewModel : ViewModel() {
             }
 
             try {
-                // Persiapkan input
-                val inputData = Array(1) { FloatArray(10) }
-                inputData[0] = floatArrayOf(
-                    (_uiState.value.age.toFloatOrNull() ?: throw IllegalArgumentException("Invalid age input")).toFloat(),
-                    (_uiState.value.gender.toFloatOrNull() ?: throw IllegalArgumentException("Invalid gender input")).toFloat(),
-                    (_uiState.value.totalBilirubin.toFloatOrNull() ?: throw IllegalArgumentException("Invalid total bilirubin input")).toFloat(),
-                    (_uiState.value.directBilirubin.toFloatOrNull() ?: throw IllegalArgumentException("Invalid direct bilirubin input")).toFloat(),
-                    (_uiState.value.alkalinePhosphotase.toFloatOrNull() ?: throw IllegalArgumentException("Invalid alkaline phosphotase input")).toFloat(),
-                    (_uiState.value.sgpt.toFloatOrNull() ?: throw IllegalArgumentException("Invalid SGPT input")).toFloat(),
-                    (_uiState.value.sgot.toFloatOrNull() ?: throw IllegalArgumentException("Invalid SGOT input")).toFloat(),
-                    (_uiState.value.totalProtein.toFloatOrNull() ?: throw IllegalArgumentException("Invalid total protein input")).toFloat(),
-                    (_uiState.value.albumin.toFloatOrNull() ?: throw IllegalArgumentException("Invalid albumin input")).toFloat(),
-                    (_uiState.value.albuminGlobulinRatio.toFloatOrNull() ?: throw IllegalArgumentException("Invalid albumin globulin ratio input")).toFloat()
-                )
-
-                // Log untuk input
-                Log.d("HomeViewModel", "Input Data: ${inputData[0].joinToString(", ")}")
+                // Validasi dan persiapkan input data
+                val inputData = prepareInputData()
 
                 // Prediksi
                 val outputData = Array(1) { FloatArray(1) }
                 interpreter?.run(inputData, outputData)
 
                 // Log untuk output
-                Log.d("ModelOutputShape", "Predicted output shape: ${outputData.contentToString()}")
+                Log.d("ModelOutputShape", "Predicted output structure: ${outputData[0].contentToString()}")
 
-
-                // Proses output
-                val prediction = if (outputData[0][0] == 1f) "High Risk" else "Low Risk"
+                // Proses output untuk menentukan hasil prediksi
+                val prediction = if (outputData[0][0] >= 0.398f) "High Risk" else "Low Risk"
                 _uiState.value = _uiState.value.copy(predictionResult = prediction, errorMessage = null)
             } catch (e: IllegalArgumentException) {
                 _uiState.value = _uiState.value.copy(errorMessage = e.message)
@@ -139,6 +150,30 @@ class HomeViewModel : ViewModel() {
         }
     }
 
+    // Fungsi untuk mempersiapkan data input dari UI state dan normalisasi
+    private fun prepareInputData(): Array<FloatArray> {
+        val inputData = Array(1) { FloatArray(10) }
+
+        inputData[0] = floatArrayOf(
+            (_uiState.value.age.toFloatOrNull() ?: 0f),
+            (_uiState.value.gender.toFloatOrNull() ?: 0f),
+            (_uiState.value.totalBilirubin.toFloatOrNull() ?: 0f),
+            (_uiState.value.directBilirubin.toFloatOrNull() ?: 0f),
+            (_uiState.value.alkalinePhosphotase.toFloatOrNull() ?: 0f),
+            (_uiState.value.sgpt.toFloatOrNull() ?: 0f),
+            (_uiState.value.sgot.toFloatOrNull() ?: 0f),
+            (_uiState.value.totalProtein.toFloatOrNull() ?: 0f),
+            (_uiState.value.albumin.toFloatOrNull() ?: 0f),
+            (_uiState.value.albuminGlobulinRatio.toFloatOrNull() ?: 0f)
+        )
+
+        // Normalisasi menggunakan rata-rata dan deviasi standar
+        for (i in inputData[0].indices) {
+            inputData[0][i] = (inputData[0][i] - means[i]) / stdDevs[i]
+        }
+
+        return inputData
+    }
 
     // Fungsi setter untuk input parameter
     fun onAgeChange(newValue: String) {

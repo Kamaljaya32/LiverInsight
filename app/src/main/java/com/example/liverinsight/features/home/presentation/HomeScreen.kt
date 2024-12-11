@@ -30,12 +30,12 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .verticalScroll(rememberScrollState()), // Enables vertical scrolling
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Liver Disease Detection",
+            text = "Liver Disease Prediction",
             style = MaterialTheme.typography.displaySmall,
             color = Color(0xffcc2b31)
         )
@@ -44,6 +44,8 @@ fun HomeScreen(
 
         // Input fields for parameters
         InputField(label = "Age", value = state.value.age, onValueChange = viewModel::onAgeChange)
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Gender input using RadioButton
         GenderInput(
@@ -94,7 +96,7 @@ fun HomeScreen(
         // Button to predict
         Button(
             onClick = { viewModel.predictDisease() },
-            colors = ButtonDefaults.buttonColors()
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xffcc2b31))
         ) {
             Text("Predict")
         }
@@ -126,6 +128,11 @@ fun InputField(label: String, value: String, onValueChange: (String) -> Unit) {
         label = { Text(label) },
         modifier = Modifier.fillMaxWidth(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color(0xffcc2b31),
+            cursorColor = Color(0xffcc2b31),
+            focusedLabelColor = Color(0xffcc2b31)
+        )
     )
 }
 
@@ -140,7 +147,11 @@ fun GenderInput(selectedGender: String, onGenderChange: (String) -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
                     selected = selectedGender == "0",
-                    onClick = { onGenderChange("0") }
+                    onClick = { onGenderChange("0") },
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = if (selectedGender == "0") Color(0xffcc2b31) else Color.Gray,
+                        unselectedColor = Color.Gray
+                    )
                 )
                 Text("Female")
             }
@@ -148,7 +159,11 @@ fun GenderInput(selectedGender: String, onGenderChange: (String) -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
                     selected = selectedGender == "1",
-                    onClick = { onGenderChange("1") }
+                    onClick = { onGenderChange("1") },
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = if (selectedGender == "1") Color(0xffcc2b31) else Color.Gray,
+                        unselectedColor = Color.Gray
+                    )
                 )
                 Text("Male")
             }
