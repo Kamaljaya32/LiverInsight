@@ -18,7 +18,7 @@ fun DownloadModelComposable() {
             .build()
 
         FirebaseModelDownloader.getInstance()
-            .getModel("liver-detection", DownloadType.LOCAL_MODEL, conditions)
+            .getModel("liver-detection2", DownloadType.LOCAL_MODEL, conditions)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(context, "Model downloaded successfully!", Toast.LENGTH_SHORT).show()
